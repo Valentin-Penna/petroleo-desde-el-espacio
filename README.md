@@ -30,17 +30,25 @@ En las imágenes de 2022 a 2026, que no se usaron para calibrar, el error típic
 
 ## ¿Y eso da ventaja para operar?
 
-Con imágenes gratuitas, todavía no.
+No. Y no solo porque el satélite se quede corto.
 
-Para adelantarse al dato del miércoles hay que acertar el cambio de una semana, y de una semana a otra Cushing cambia menos de un millón de barriles. El error entre dos imágenes consecutivas es de 2,4 millones: la señal es más pequeña que el ruido. El método acierta si las existencias suben o bajan el 62 % de las veces a una semana y el 71 % a un mes, pero a un mes el dato oficial ya se ha publicado cuatro veces.
+**El satélite no afina lo bastante.** Para adelantarse al dato del miércoles hay que acertar el cambio de una semana, y de una semana a otra Cushing cambia menos de un millón de barriles. El error entre dos imágenes consecutivas es de 2,4 millones: la señal es más pequeña que el ruido. Solo hay imagen nueva la mitad de las semanas, y cuando la hay coincide con el sentido del dato oficial el 63 % de las veces.
 
-Hay tres cosas que lo limitan:
+**Y aunque afinara, saberlo antes no sirve.** Probé una regla sencilla sobre once años de precios: cada semana, si las existencias suben se compran las empresas dueñas de los tanques (cobran por el espacio alquilado), y si bajan se está fuera. Para el crudo, al revés. La regla se compara con 5.000 versiones de sí misma con las semanas barajadas al azar; si no gana a casi todas, es suerte.
+
+![Resultado del backtest](resultados/backtest.png)
+
+- Conociendo el dato oficial exacto cinco días antes de que se publique (un satélite perfecto), la regla no se distingue del azar.
+- Con la estimación real del satélite, tampoco.
+- Donde sí aparece algo es con el dato ya publicado: las cuatro empresas lo hacen mejor la semana siguiente a una subida de existencias que tras una bajada, y la regla supera a entre el 95 % y el 100 % de las barajadas. Se mantiene en las dos mitades del periodo y no se explica por un simple rebote del precio.
+
+Ese último resultado hay que leerlo con cuidado. Las cuatro acciones se mueven juntas, así que es un resultado y no cuatro. No incluye comisiones. Y lo encontré después de probar varios días de entrada, lo que siempre favorece encontrar algo. En cualquier caso, para aprovecharlo no hace falta ningún satélite: basta con leer el dato el miércoles.
+
+Lo que limita la medición desde el espacio:
 
 - **Resolución.** En verano el sol está a 70° y las sombras miden menos de 5 metros, medio píxel.
 - **Nubes.** De 670 pasadas del satélite, 320 están despejadas. Algunos meses solo hay una o dos imágenes.
 - **Tanques pequeños.** Los 52 de menos de unos 36 metros de diámetro no dan píxeles suficientes y se quedan fuera. Los otros 355 suman el 94 % de la capacidad.
-
-Las tres tienen arreglo con mejores datos: el radar de Sentinel-1 ve a través de las nubes y también es gratuito, y las imágenes comerciales de 3 metros resolverían la sombra directamente. Eso es lo que compran los fondos.
 
 ## Cómo funciona
 
@@ -51,7 +59,7 @@ Las tres tienen arreglo con mejores datos: el radar de Sentinel-1 ve a través d
 5. **Ajuste.** Para cada tanque y fecha se dibuja cómo se vería con cada longitud de sombra posible, se emborrona como lo hace la óptica del satélite, y se elige la que más se parece a la imagen real.
 6. **Punto cero.** La sombra tiene que ser proporcional a `1/tan(a)` y desaparecer con el sol en lo más alto. Si para un tanque no es así, lo que sobra es el error de posición de ese tanque, y se le resta. Este paso es el que hace que funcione también en verano.
 
-Nada de lo anterior usa el dato oficial. Solo al final se ajusta una recta para pasar de volumen medido a barriles, usando únicamente las imágenes anteriores a 2022.
+La medición no usa el dato oficial. Solo al final se ajusta una recta para pasar de volumen medido a barriles, con las imágenes anteriores a 2022. Aun así, la prueba de 2022 a 2026 no es del todo ciega: para elegir entre dos versiones del modelo sí comparé con el dato oficial de todo el periodo.
 
 ## Ejecutarlo
 
@@ -65,15 +73,18 @@ python -m venv .venv
 .venv/bin/python src/parches.py     # alinear y recortar cada tanque
 .venv/bin/python src/medir.py       # medir la sombra de cada tanque
 .venv/bin/python src/comparar.py    # comparar con la EIA y dibujar las gráficas
+.venv/bin/python src/precios.py     # precios del crudo y de las empresas dueñas de tanques
+.venv/bin/python src/backtest.py    # probar si la información sirve para operar
 ```
 
-Las medidas ya calculadas están en `data/medidas.npz`, así que el último paso se puede ejecutar sin descargar nada.
+Las medidas ya calculadas están en `data/medidas.npz`, así que los tres últimos pasos se pueden ejecutar sin descargar las imágenes.
 
 ## Datos
 
 - Imágenes: Copernicus Sentinel-2 (ESA), a través de [Earth Search](https://earth-search.aws.element84.com/v1) en AWS.
 - Tanques: © colaboradores de [OpenStreetMap](https://www.openstreetmap.org/copyright), licencia ODbL.
 - Existencias de crudo: [U.S. Energy Information Administration](https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=W_EPC0_SAX_YCUOK_MBBL&f=W).
+- Precios: Yahoo Finance, cierres ajustados por dividendos.
 
 La idea de medir Cushing con Sentinel-2 viene de [este vídeo de LosingLoonies](https://www.youtube.com/watch?v=VJm9BBJwMDY). El código y el método de este repositorio son propios.
 
