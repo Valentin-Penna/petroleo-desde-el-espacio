@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+# imágenes descargadas y parches intermedios: pesan cientos de MB y se regeneran con los scripts
+data/recortes/
+data/*.npy

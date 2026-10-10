@@ -1,0 +1,10 @@
+numpy
+pandas
+scipy
+matplotlib
+rasterio
+pystac-client
+pyproj
+requests
+scikit-image
+xlrd
