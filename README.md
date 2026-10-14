@@ -61,23 +61,15 @@ Lo que limita la medición desde el espacio:
 
 La medición no usa el dato oficial. Solo al final se ajusta una recta para pasar de volumen medido a barriles, con las imágenes anteriores a 2022. Aun así, la prueba de 2022 a 2026 no es del todo ciega: para elegir entre dos versiones del modelo sí comparé con el dato oficial de todo el periodo.
 
-## Ejecutarlo
+## Tecnologías
 
-```bash
-python -m venv .venv
-.venv/bin/pip install -r requirements.txt
+Python, por su ecosistema para imágenes de satélite y análisis de datos:
 
-.venv/bin/python src/tanques.py     # tanques desde OpenStreetMap
-.venv/bin/python src/eia.py         # dato oficial de la EIA
-.venv/bin/python src/imagenes.py    # recortes de Sentinel-2 (unos 300 MB)
-.venv/bin/python src/parches.py     # alinear y recortar cada tanque
-.venv/bin/python src/medir.py       # medir la sombra de cada tanque
-.venv/bin/python src/comparar.py    # comparar con la EIA y dibujar las gráficas
-.venv/bin/python src/precios.py     # precios del crudo y de las empresas dueñas de tanques
-.venv/bin/python src/backtest.py    # probar si la información sirve para operar
-```
+- **pystac-client** y **rasterio** buscan las pasadas de Sentinel-2 y descargan solo el recorte de Cushing de cada imagen, sin bajarla entera.
+- **NumPy**, **SciPy** y **scikit-image** alinean las imágenes y ajustan la sombra de cada tanque.
+- **pandas** y **matplotlib** cruzan las medidas con el dato oficial, hacen el backtest y dibujan las gráficas.
 
-Las medidas ya calculadas están en `data/medidas.npz`, así que los tres últimos pasos se pueden ejecutar sin descargar las imágenes.
+El proceso está en `src/`, un script por paso, y se repite de principio a fin. Las medidas ya calculadas están en `data/medidas.npz`.
 
 ## Datos
 
